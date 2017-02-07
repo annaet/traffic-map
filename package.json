@@ -1,0 +1,19 @@
+{
+  "name": "traffic-map",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Collection utility for the TFL Unified API",
+  "repository": "https://github.com/annaet/traffic-map",
+  "license": "MIT",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "node ./app.js",
+    "pretest": "npm install",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "cfenv": "1.0.x",
+    "express": "^4.14.0",
+    "leaflet.awesome-markers": "^2.0.4"
+  }
+}

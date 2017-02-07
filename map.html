@@ -1,0 +1,94 @@
+<html>
+<head>
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+   <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
+   <link rel="stylesheet" href="node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.css">
+
+   <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+   <script src="node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
+   <script src="https://use.fontawesome.com/695c9981b9.js"></script>
+</head>
+
+<body>
+  <div id="mapid" style="height: 880px"></div>
+
+  <script>
+    var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/annaet/ciqwdytcm000d1tngmuszvxia/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYW5uYWV0IiwiYSI6ImNpcXdkeTFhdzAwMnBodG5qZnhsa3pwNzgifQ.sLCy6WaD4pURO1ulOFoVCg', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      maxZoom: 18,
+      id: 'ciqwdytcm000d1tngmuszvxia',
+      accessToken: 'pk.eyJ1IjoiYW5uYWV0IiwiYSI6ImNpcXdkeTFhdzAwMnBodG5qZnhsa3pwNzgifQ.sLCy6WaD4pURO1ulOFoVCg'
+    }).addTo(mymap);
+
+    var redMarker = L.AwesomeMarkers.icon({
+      icon: 'camera',
+      prefix: 'fa',
+      markerColor: 'red'
+    })
+
+    var blueMarker = L.AwesomeMarkers.icon({
+      icon: 'car',
+      prefix: 'fa',
+      markerColor: 'blue'
+    })
+
+    var greenMarker = L.AwesomeMarkers.icon({
+      icon: 'bicycle',
+      prefix: 'fa',
+      markerColor: 'green'
+    })
+
+    $.get("/traffic_cams", function(data) {
+      for (let cam of data) {
+        var content = '<h3>' + cam.commonName + '</h3><p>' + cam.additionalProperties[3].value + '</p>'
+
+        L.marker([cam.lat, cam.lon], {icon: redMarker})
+          .addTo(mymap)
+          .bindPopup(content).openPopup()
+      }
+    })
+
+    $.get("/car_parks", function(data) {
+      for (let carpark of data) {
+        var content = '<h3>' + carpark.commonName + '</h3>'
+
+        L.marker([carpark.lat, carpark.lon], {icon: blueMarker})
+          .addTo(mymap)
+          .bindPopup(content).openPopup()
+      }
+    })
+
+    $.get("/bike_points", function(data) {
+      for (let bike of data) {
+        var content = '<h3>' + bike.commonName + '</h3><p>' + bike.additionalProperties[6].value + ' available, ' + bike.additionalProperties[8].value + ' total</p>'
+
+        L.marker([bike.lat, bike.lon], {icon: greenMarker})
+          .addTo(mymap)
+          .bindPopup(content).openPopup()
+      }
+    })
+
+    $.get("/roads", function(data) {
+      for (let road of data) {
+        let bounds = JSON.parse(road.envelope)
+        let reversedBounds = []
+        for (let lonlat of bounds) {
+          reversedBounds.push([lonlat[1], lonlat[0]])
+        }
+
+        var content = '<h3>' + road.displayName + '</h3><p>' + road.statusSeverity + ' : ' + road.statusSeverityDescription + '</p>'
+
+        L.polygon(reversedBounds)
+          .addTo(mymap)
+          .bindPopup(content).openPopup()
+      }
+    })
+  </script>
+</body>
+</html>
