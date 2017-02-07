@@ -15,5 +15,8 @@
     "cfenv": "1.0.x",
     "express": "^4.14.0",
     "leaflet.awesome-markers": "^2.0.4"
+  },
+  "engines": {
+    "node": "6.9.x"
   }
 }
